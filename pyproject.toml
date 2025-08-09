@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quacq"
+version = "0.1.0"
+description = "implementation of QUACQ a constraint acquisition method to help users acquire constraints for their optimization problems"
+authors = [
+    { name = "Hamza ISLAH", email = "islah.hamza1997@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+
+dependencies = [
+    "black>=23.0",
+    "networkx>=2.8",
+    "ortools>=9.6",
+    "pytest>=7.0",
+    "torch>=2.0",
+    "torch_geometric>=2.0",
+    "tqdm>=4.0",
+    "scikit-learn"
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
