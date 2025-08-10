@@ -114,14 +114,22 @@ def Bais(Language, variables):
 
 class Target_Network:
  
-    def __init__(self, constraints):
+    def __init__(self, constraints=None, mode="default") -> None:
         self.constraints = constraints
         self.ask_counter = 0
-       
+        self.mode = mode
+        if mode == "default":
+            if constraints is None:
+                raise ValueError("Please provide constraints for the default mode")
 
     def ask(self, example):
         self.ask_counter += 1
-        return all(c.check(example)!= False for c in self.constraints)
+        if self.mode == "human":
+            print("Is the example valid? (yes/no):")
+            print(f"Example: {example}")
+            return input().strip().lower() == "yes"
+        else:
+            return all(c.check(example)!= False for c in self.constraints)
 
     def __str__(self) -> str:
         return  f"Total constraints: {len(self.constraints)}\nTotal asks: {self.ask_counter}"
