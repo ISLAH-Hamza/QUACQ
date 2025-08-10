@@ -4,16 +4,20 @@ import itertools
 
 class Variable:
     def __init__(self, name, domain) -> None:
-        
-        assert isinstance(domain, list), "The domain of a variable should be a list"
+        # input validation
         assert isinstance(name, str), "The identifier should be a string"
-        
+        assert isinstance(domain, (list, tuple)), "Domain must be a list or tuple"
+        assert len(domain) == 2, "The domain should contain exactly two elements"
+        assert all(isinstance(x, (int, float)) for x in domain), "The domain should contain numeric values"
+        lo, hi = domain
+        assert lo < hi, "The first element of the domain should be less than the second"
+
         self.name = name
-        self.domain = domain
-        
+        self.domain = [lo, hi]
+
     def __str__(self) -> str:
-            return f"name:{self.name} | domain:{self.domain}"
-        
+        return f"name:{self.name} | domain:{self.domain}"
+
 
 
 
