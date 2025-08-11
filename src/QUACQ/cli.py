@@ -1,7 +1,7 @@
 import argparse
 from QUACQ.core import *
 from QUACQ.acquisition import QuAcq
-from QUACQ.benchmarks import zebra, jigsaw
+from benchmarks import zebra, jigsaw, rflap, murder
 from QUACQ.utils import logger
 
 import random
@@ -18,7 +18,7 @@ def main():
     # 1. Argument parser
     parser = argparse.ArgumentParser(description="Constraint Acquisition with GNN")
 
-    parser.add_argument("--benchmark", type=str, choices=["zebra" , "jigsaw"], required=True,
+    parser.add_argument("--benchmark", type=str, choices=["zebra" , "jigsaw","murder","rflap"], required=True,
                         help="Select the benchmark problem to run.")
              
     parser.add_argument("--output", type=str, default="results",
@@ -33,7 +33,9 @@ def main():
     # 2. Load selected benchmark
     benchmark_map = {
         "zebra": zebra,
-        "jigsaw": jigsaw
+        "jigsaw": jigsaw,
+        "murder": murder,
+        "rflap": rflap
     }
     
     model = benchmark_map[args.benchmark].Model()
