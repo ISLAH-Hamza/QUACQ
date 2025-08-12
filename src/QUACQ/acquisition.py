@@ -110,6 +110,30 @@ def Constraint2Boolean(c,b,model,variables)->None:
                 model.Add(temp_variable > parameter).OnlyEnforceIf(b.Not())
 
 
+
+
+def Solve(L,vars,logger=None):
+ 
+    if logger: logger.info('solve constraints from L')
+    m=cp_model.CpModel()
+    variables={v.name:m.NewIntVar(*v.domain,v.name) for v in vars}
+
+    for conj in L:
+        for c in conj:
+             Constraint2CPModel(c,m,variables=variables)
+
+    solver = cp_model.CpSolver()
+    status = solver.Solve(m)
+
+    if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
+        sol={i: solver.Value(variables[i])for i in variables.keys()}
+        if logger:logger.info(f'solution:\n{sol}')
+        return sol
+
+
+
+
+# ===========================  quacq function & it's procedures =================
 def GeneratExample(B,L,vars,logger=None):
  
     if logger: logger.info('start generating example')
@@ -318,3 +342,4 @@ def QuAcq(B, variables, target_network,logger=None):
 
         pbar.n = B_initial_size - len(B)
         pbar.refresh()
+
