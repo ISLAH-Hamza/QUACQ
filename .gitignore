@@ -1,0 +1,14 @@
+**/__pycache__/
+**/.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.log
+*.tmp
+.DS_Store
+.venv/
+.vscode/
+*.egg-info
+TODO.md
