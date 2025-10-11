@@ -12,3 +12,4 @@
 .vscode/
 *.egg-info
 TODO.md
+results/
