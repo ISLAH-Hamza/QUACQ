@@ -1,5 +1,5 @@
 import itertools
-from QUACQ.core import *
+from .core import *
 from ortools.sat.python import cp_model
 from tqdm import tqdm
 
@@ -136,6 +136,7 @@ def Solve(L,vars,logger=None):
             vars    : The list of variables to use in the constraints.
             logger  : An optional logger to log information.
     """
+    
     if logger: logger.info('solve constraints from L')
     m=cp_model.CpModel()
     variables={v.name:m.NewIntVar(*v.domain,v.name) for v in vars}

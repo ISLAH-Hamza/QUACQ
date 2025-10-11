@@ -1,4 +1,4 @@
-from QUACQ.core import *
+from quacq.core import *
 import random
 
 class Model:
