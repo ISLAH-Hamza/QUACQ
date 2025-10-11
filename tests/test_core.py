@@ -1,5 +1,5 @@
 import pytest
-from QUACQ.core import *
+from quacq.core import *
 
 
 

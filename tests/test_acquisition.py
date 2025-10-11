@@ -1,6 +1,6 @@
 import pytest
-from QUACQ.acquisition import *
-from QUACQ.core import Variable, Relation, Constraints, Target_Network
+from quacq.acquisition import *
+from quacq.core import Variable, Relation, Constraints, Target_Network
 
 
 
@@ -33,7 +33,7 @@ def test_generate_example():
     B = {c1, c2}
     L = []
     vars = [x, y]
-    example = GeneratExample(B, L, vars)
+    example = GenerateExample(B, L, vars)
     assert example is not None
     assert set(example.keys()) == {"x", "y"}
     # Should not satisfy all constraints in B
