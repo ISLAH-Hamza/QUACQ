@@ -3,6 +3,10 @@ import random
 
 
 class Model:
+    """
+        A class to represent the Murder mystery benchmark model.
+        The model consists of 20 variables with a domain of [0,4] and a set of constraints used as clues in the investigation.
+    """
     def __init__(self) -> None:
         
         self.domain=[0,4]

@@ -4,7 +4,13 @@ from ortools.sat.python import cp_model
 from tqdm import tqdm
 
 def Constraint2CPModel(c,model,variables) -> None:
-
+    """
+        Convert a constraint to a ortools CP model.
+        args:
+            c         : The constraint to convert.
+            model     : The CP model to add the constraint to.
+            variables : The mapping of variable names to CP variables.
+    """
     if c.relation.arity==1:
         i=c.scope[0].name
     else:
@@ -49,7 +55,17 @@ def Constraint2CPModel(c,model,variables) -> None:
 
 
 def Constraint2Boolean(c,b,model,variables)->None:
-
+    """
+        associate a constraint with a boolean variable, if the constraint will be satisfied the boolean variable will be true.
+        otherwise, the boolean variable will be false.
+        This is useful for assuring the number of constraint satisfied by the problem is bounded by specific number
+        see generate_query to see the application
+        args:
+            c         : The constraint to convert.
+            b         : The boolean variable to associate with the constraint.
+            model     : The CP model to add the constraint to.
+            variables : The mapping of variable names to CP variables.
+    """
     if c.relation.arity==1:
         i=c.scope[0].name
     else:
@@ -113,7 +129,13 @@ def Constraint2Boolean(c,b,model,variables)->None:
 
 
 def Solve(L,vars,logger=None):
- 
+    """
+        Solve the constraints in L using the given variables in cp_model from ortools.
+        args:
+            L       : The list of constraints to solve.
+            vars    : The list of variables to use in the constraints.
+            logger  : An optional logger to log information.
+    """
     if logger: logger.info('solve constraints from L')
     m=cp_model.CpModel()
     variables={v.name:m.NewIntVar(*v.domain,v.name) for v in vars}
@@ -134,8 +156,15 @@ def Solve(L,vars,logger=None):
 
 
 # ===========================  quacq function & it's procedures =================
-def GeneratExample(B,L,vars,logger=None):
- 
+def GenerateExample(B,L,vars,logger=None):
+    """
+        Generate an example that satisfies the constraints in L while rejecting at least one constraint in B.
+        args:
+            B       : The Basis represent all possible constraint that could be used to model the problem.
+            L       : The list of constraints to satisfy.
+            vars    : The list of variables to use in the constraints.
+            logger  : An optional logger to log information.
+    """
     if logger: logger.info('start generating example')
     m=cp_model.CpModel()
     bools=[]
@@ -164,7 +193,16 @@ def GeneratExample(B,L,vars,logger=None):
 
 
 def findScope(example,R,Y,B,target_network,logger=None):
-   
+    """
+        a recursive process to find the scope of variables in example that make the answer of the user negative see more information in the original paper.
+        args:
+            example         : The example to analyze.
+            R               : The set of relevant variables.
+            Y               : The set of variables to consider.
+            B               : The Bais.
+            target_network  : The target network (which model the user's oracle/answers).
+            logger          : An optional logger to log information.
+    """
     if logger:logger.info('looking for scope that make the example nagative')
     e_R={key:val for key,val in example.items() if key in R }
     K_B=set(c for c in B if c.check(e_R)==False)
@@ -194,7 +232,11 @@ def findScope(example,R,Y,B,target_network,logger=None):
 
 
 def checkConj(s):
- 
+    """
+        helper subprosess that will be used with findC, it checks if a conjunction of constraints is satisfiable.
+        args:
+            s : The conjunction of constraints to check.
+    """
     s=list(s)
 
     if len(s)==0:
@@ -230,6 +272,13 @@ def checkConj(s):
 
 
 def join_operation(S,S_prime):
+    """
+        the join operation used in findC procedure see more information in the original paper.
+        it will join to list of constraints S and S' and return a new list of constraints.
+        args:
+            S       : The first list of constraints.
+            S_prime : The second list of constraints.
+    """
     Output=[]
     for s1,s2 in  itertools.product(S,S_prime):
         s=s1|s2
@@ -241,9 +290,15 @@ def join_operation(S,S_prime):
 
 
 
-def FindEprime(L,Y,Delta,vars) -> dict:
-    
-    
+def FindEprime(L,Y,Delta,vars) -> dict: 
+    """
+        find an example that satisfy the constraints in L and reject at least one conjunction in Delta.
+        args:
+            L      : The list of constraints to satisfy.
+            Y      : The set of variables to consider.
+            Delta  : set of candidate constraints.
+            vars   : The set of all variables.
+    """
     m=cp_model.CpModel()
 
     ### creating ortools variables
@@ -275,8 +330,19 @@ def FindEprime(L,Y,Delta,vars) -> dict:
 
 
 
-def findC(example,Y,L,B,target_network,variables,logger=None) -> None:
+def findC(example,Y,L,B,target_network,variables,logger=None):
 
+    """
+        find the conjunction of constraints that make the example negative see more information in the original paper.
+        args:
+            example         : The (negative)example to analyze.
+            Y               : The set of variables to consider.
+            L               : The list of constraints to satisfy.
+            B               : The Bais.
+            target_network  : The target network (which model the user's oracle/answers).
+            variables       : The set of all variables.
+            logger          : An optional logger to log information.
+    """
     if logger:logger.info('looking for the constraint that make the example negative')
     B_Y=set([c for c in B if all(v.name in Y for v in c.scope)])
     
@@ -310,7 +376,14 @@ def findC(example,Y,L,B,target_network,variables,logger=None) -> None:
 
 
 def QuAcq(B, variables, target_network,logger=None):
-   
+    """
+        The main QuAcq algorithm to learn the target network using the basis B and the given variables.
+        args:
+            B               : The Basis represent all possible constraint that could be used to model the problem.
+            variables       : The set of all variables.
+            target_network  : The target network (which model the user's oracle/answers).
+            logger          : An optional logger to log information.
+    """
     if logger:
         logger.info('start Quacq learning:')
         logger.info(f'initial bais contains:{len(B)}')
@@ -323,7 +396,7 @@ def QuAcq(B, variables, target_network,logger=None):
     
     while True:
        
-        example = GeneratExample(B, L, variables,logger)
+        example = GenerateExample(B, L, variables,logger)
         if example is None:
             if logger:
                 logger.info('the learning is end')

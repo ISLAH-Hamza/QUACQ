@@ -3,12 +3,10 @@ from QUACQ.core import *
 from QUACQ.acquisition import QuAcq
 from benchmarks import zebra, jigsaw, rflap, murder
 from QUACQ.utils import logger
-
 import random
 import json
 import time
 import os
-
 
 
 

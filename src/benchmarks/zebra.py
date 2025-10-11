@@ -3,6 +3,14 @@ import random
 
 
 class Model:
+    """
+    The Zebra puzzle, also known as "Einstein's Riddle," is a logic puzzle that involves deducing the arrangement of five houses, each with a unique color, nationality, pet, drink, and cigarette brand, based on a set of clues. The objective is to determine who owns the zebra and who drinks water.
+
+    This model encodes the Zebra puzzle as a constraint satisfaction problem (CSP) with:
+    - 25 variables, each representing an attribute (nationality, color, drink, pet, cigarette) for each house.
+    - Each variable has a domain of [0, 4], corresponding to the five possible values for each attribute.
+    - Constraints are defined to enforce the rules and clues of the Zebra puzzle, including uniqueness of attributes per house and relationships between attributes.
+    """
     def __init__(self) -> None:
         
         self.domain=[0,4]

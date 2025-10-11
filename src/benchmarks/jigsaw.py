@@ -4,6 +4,11 @@ import random
 
 
 class Model:
+    """
+        A class to represent the Jigsaw puzzle benchmark model.
+        The model consists of 36 variables with a domain of [1,6] and a set of constraints to ensure that no two adjacent pieces have the same value.
+        The model also includes additional constraints to ensure that pieces in the same row or column do not share the same value.
+    """
     def __init__(self) -> None:
         
         self.domain=[1,6]

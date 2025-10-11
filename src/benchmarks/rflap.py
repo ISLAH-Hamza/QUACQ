@@ -2,6 +2,12 @@ from QUACQ.core import *
 import random
 
 class Model:
+    """
+    A class to represent the Radio Link Frequency Assignment Problem (RFLAP) benchmark model.
+    This model assigns frequencies (channels) to a set of 25 radio links (variables) with a domain of [0, 32].
+    It enforces interference constraints to ensure that no two variables in the same group have the same value,
+    and applies additional constraints between groups to model realistic frequency assignment requirements.
+    """
     def __init__(self) -> None:
         
         self.domain=[0,32]

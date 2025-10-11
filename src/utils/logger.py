@@ -45,6 +45,9 @@ def setup_logger(to_console=True):
 
 
 def log(logger, message, level="info"):
+    """
+        Log a message with a specific logging level.
+    """
     if logger is None:
         return
     level = level.lower()

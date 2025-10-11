@@ -3,6 +3,9 @@ import itertools
 
 
 class Variable:
+    """
+        A class to represent a variable with a name and a numeric domain.
+    """
     def __init__(self, name, domain) -> None:
         # input validation
         assert isinstance(name, str), "The identifier should be a string"
@@ -22,7 +25,9 @@ class Variable:
 
 
 class Relation:
-
+    """
+        A class to represent a relation with an operator, arity, directionality, and optional parameter.
+    """
     def __init__(self, operator, arity, directed, parameter=None) -> None:
       
         self.operator = operator
@@ -47,7 +52,9 @@ class Relation:
 
 
 class Constraints:
-
+    """
+        A class to represent a constraint in the model.
+    """
     def __init__(self, scope, relation) -> None:
 
         self.scope = scope
@@ -95,6 +102,12 @@ class Constraints:
 
 
 def Bais(Language, variables):
+    """
+        Generate the basis (set of all possible constraints) from the given language and variables.
+        args:
+            Language    : A list of Relation objects defining the constraint language.
+            variables   : A list of Variable objects to use in the constraints.
+    """
     constraints = set()
 
     for relation in Language:
@@ -117,7 +130,9 @@ def Bais(Language, variables):
 
 
 class Target_Network:
- 
+    """
+        A class to represent the target network (the user's oracle/answers).
+    """
     def __init__(self, constraints=None, mode="default") -> None:
         self.constraints = constraints
         self.ask_counter = 0
