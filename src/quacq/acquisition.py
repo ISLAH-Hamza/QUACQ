@@ -2,6 +2,7 @@ import itertools
 from .core import *
 from ortools.sat.python import cp_model
 from tqdm import tqdm
+from utils.logger import writelog
 
 def Constraint2CPModel(c,model,variables) -> None:
     """
@@ -150,7 +151,7 @@ def Solve(L,vars,logger=None):
 
     if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
         sol={i: solver.Value(variables[i])for i in variables.keys()}
-        if logger:logger.info(f'solution:\n{sol}')
+        writelog(logger,f'solution:\n{sol}',level="debug")
         return sol
 
 
@@ -166,7 +167,8 @@ def GenerateExample(B,L,vars,logger=None):
             vars    : The list of variables to use in the constraints.
             logger  : An optional logger to log information.
     """
-    if logger: logger.info('start generating example')
+    writelog(logger,'start generating example')
+
     m=cp_model.CpModel()
     bools=[]
     variables={v.name:m.NewIntVar(*v.domain,v.name) for v in vars}
@@ -189,7 +191,7 @@ def GenerateExample(B,L,vars,logger=None):
 
     if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
         sol={i: solver.Value(variables[i])for i in variables.keys()}
-        if logger:logger.info(f'the function succesfly generate solution:\n{sol}')
+        writelog(logger,f'the function succesfly generate solution:\n{sol}')
         return sol
 
 
@@ -204,7 +206,7 @@ def findScope(example,R,Y,B,target_network,logger=None):
             target_network  : The target network (which model the user's oracle/answers).
             logger          : An optional logger to log information.
     """
-    if logger:logger.info('looking for scope that make the example nagative')
+    writelog(logger,'looking for scope that make the example nagative')
     e_R={key:val for key,val in example.items() if key in R }
     K_B=set(c for c in B if c.check(e_R)==False)
 
@@ -221,13 +223,13 @@ def findScope(example,R,Y,B,target_network,logger=None):
     if set(c for c in B if c.check(e_R_Y1)==False)==set(c for c in B if c.check(e_R_Y)==False):
         S1=set()
     else:
-        S1=findScope(example,set(R)|Y1,Y2,B,target_network)
+        S1=findScope(example,set(R)|Y1,Y2,B,target_network,logger=logger)
 
     e_R_S1={key:val for key,val in example.items() if key in set(R)|S1}
     if set(c for c in B if c.check(e_R_S1)==False)==set(c for c in B if c.check(e_R_Y)==False):
         S2=set()
     else:
-        S2=findScope(example,set(R)|S1,Y1,B,target_network)
+        S2=findScope(example,set(R)|S1,Y1,B,target_network,logger=logger)
 
     return S1|S2
 
@@ -344,7 +346,7 @@ def findC(example,Y,L,B,target_network,variables,logger=None):
             variables       : The set of all variables.
             logger          : An optional logger to log information.
     """
-    if logger:logger.info('looking for the constraint that make the example negative')
+    writelog(logger,'looking for the constraint that make the example negative')
     B_Y=set([c for c in B if all(v.name in Y for v in c.scope)])
     
     Delta=[{item} for item in B_Y]
@@ -366,9 +368,9 @@ def findC(example,Y,L,B,target_network,variables,logger=None):
                 B.difference_update(set(c for c in B if c.check(eprime)==False))
               
             else:
-                S=findScope(eprime,set(),Y,B,target_network)
+                S=findScope(eprime,set(),Y,B,target_network,logger=logger)
                 if all(i in Y for i in S) and len(S)<len(Y):
-                    findC(eprime,S,L,B,target_network,variables)
+                    findC(eprime,S,L,B,target_network,variables,logger=logger)
                 else:
                     Delta=join_operation(Delta,K_DeltaEprime)
 
@@ -385,9 +387,9 @@ def QuAcq(B, variables, target_network,logger=None):
             target_network  : The target network (which model the user's oracle/answers).
             logger          : An optional logger to log information.
     """
-    if logger:
-        logger.info('start Quacq learning:')
-        logger.info(f'initial bais contains:{len(B)}')
+    
+    writelog(logger,'start Quacq learning:')
+    writelog(logger,f'initial bais contains:{len(B)}')
 
     L = []
     B_initial_size = len(B)
@@ -399,9 +401,10 @@ def QuAcq(B, variables, target_network,logger=None):
        
         example = GenerateExample(B, L, variables,logger)
         if example is None:
-            if logger:
-                logger.info('the learning is end')
-                logger.info(f'L contain: {len(L)}')
+            
+            writelog(logger,'the learning is end')
+            writelog(logger,f'L contain: {len(L)}')
+            
             pbar.n = B_initial_size - len(B)
             pbar.refresh()
             pbar.close()

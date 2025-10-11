@@ -44,7 +44,7 @@ def setup_logger(to_console=True):
     return logger
 
 
-def log(logger, message, level="info"):
+def writelog(logger, message, level="info"):
     """
         Log a message with a specific logging level.
     """
