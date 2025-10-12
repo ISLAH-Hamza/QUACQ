@@ -13,3 +13,4 @@
 *.egg-info
 TODO.md
 results/
+logs/
