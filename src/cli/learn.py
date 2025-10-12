@@ -11,7 +11,12 @@ import os
 
 
 
-def main(benchmark, output,logger=None):
+def main(benchmark, output,console_log='yes'):
+    if console_log =='yes':
+        logger=setup_logger(to_console=True)
+    else:
+        logger=setup_logger(to_console=False)
+
 
     writelog(logger,f"start learning the benchmark {benchmark} using quacq algorithm")    
     
@@ -30,12 +35,21 @@ def main(benchmark, output,logger=None):
 
     L = QuAcq(B=model.bais, variables=model.variables, target_network=t,logger=logger)
     
-
+    writelog(logger,'learned constraints are:')
+    for conj in L:
+        for c in conj:
+            writelog(logger,f" {c}")
+    
     # convergence check
     sol=Solve(L,model.variables)
-    if len(sol) == 0: writelog(logger,'no solution found',level="error")
-    # 3. Output results
+    ## save the constraint only if the problem converge
     
+    # TODO: fixe the stability of the learning algorithm
+    if sol == None:
+        writelog(logger,'no solution found',level="error")
+        return None    
+    
+    # 3. Output results
     output_data={
         "method":"QuAcq",
         "benchmark":benchmark,
@@ -53,7 +67,7 @@ def main(benchmark, output,logger=None):
 
 if __name__=="__main__":
 
-    logger = setup_logger(to_console=True)
+   
     parser = argparse.ArgumentParser(description="Constraint Acquisition with GNN")
 
     parser.add_argument("--benchmark", type=str, choices=["zebra" , "jigsaw","murder","rflap"], required=True,
@@ -61,7 +75,9 @@ if __name__=="__main__":
              
     parser.add_argument("--output", type=str, default="results",
                         help="Path to the output results file.")
+    
+    parser.add_argument('--console_log', type=str, default='yes',)
    
     args = parser.parse_args()
     
-    main(**args.__dict__ | {'logger':logger})
+    main(**args.__dict__)
