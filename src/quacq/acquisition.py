@@ -32,7 +32,10 @@ def Constraint2CPModel(c,model,variables) -> None:
     elif op == "<"        : model.Add(variables[i]<variables[j])
     elif op == ">="       : model.Add(variables[i]>=variables[j])
     elif op == ">"        : model.Add(variables[i]>variables[j])
-    elif op == "||==val"  : model.AddAbsEquality(parameter, variables[i] - variables[j])
+    elif op == "||==val"  :
+            temp_variable=model.NewIntVar(0, max(variables[i].Proto().domain[1],variables[j].Proto().domain[1]), f"abs_{i}_{j}")
+            model.AddAbsEquality(temp_variable, variables[i] - variables[j])
+            model.Add(temp_variable == parameter)
     elif op == "||!=val"  :
             temp_variable=model.NewIntVar(0, max(variables[i].Proto().domain[1],variables[j].Proto().domain[1]), f"abs_{i}_{j}")
             model.AddAbsEquality(temp_variable, variables[i] - variables[j])
@@ -183,7 +186,6 @@ def GenerateExample(B,L,vars,logger=None):
     
 
     m.Add(sum(bools) != len(B))
-    m.Add(sum(bools) > 0)
 
     solver = cp_model.CpSolver()
     status = solver.Solve(m)
@@ -357,10 +359,10 @@ def findC(example,Y,L,B,target_network,variables,logger=None):
     
     while True:
         eprime=FindEprime(L,Y,Delta,variables)
-        if eprime==None:
+        if eprime == None:
             L.append((Delta[0]))
-            B.difference_update(B_Y)
-            return 
+            B.difference_update(Delta[0])
+            return
         else:
             K_DeltaEprime=[conj for conj in Delta  if any(c.check(eprime)==False for c in conj)]
             if target_network.ask(eprime)==True:
